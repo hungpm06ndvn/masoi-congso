@@ -367,6 +367,8 @@ body.day .felt{background:radial-gradient(circle at 50% 40%,rgba(255,214,140,.40
 .di.wolf .dn2{background:linear-gradient(135deg,#ff7d9a,#e2364a);color:#fff}
 #ver{position:relative;z-index:1;text-align:center;font-size:11px;letter-spacing:.3px;color:rgba(255,255,255,.32);padding:4px 0 calc(14px + env(safe-area-inset-bottom));pointer-events:none}
 .upd{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:90;padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#ffd76b,#ff8a5c);color:#2a1300;font-weight:800;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 10px 24px -8px rgba(0,0,0,.5);animation:pop .3s}
+.cont{display:inline-flex;align-items:center;gap:8px;margin:14px 0 8px;padding:11px 18px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid var(--gline);font-weight:800;font-size:15px;animation:pop .4s .5s both}
+.cont.over{background:linear-gradient(135deg,#ffd76b,#ff8a5c);color:#2a1300;border-color:transparent}
 </style>
 </head>
 <body class="night">
@@ -663,7 +665,7 @@ function leaveRoom() { socket.emit('leave'); st.set('msc_room', null); ST = null
 function badges(p, o) {
   let b = '', l = '';
   if (p.role) b = art(p.role);
-  else if (p.revealed && p.team) b = teamMark(p.team);
+
   else if (p.known !== undefined) b = p.known ? teamMark('wolf') : okMark();
   if (p.lover) l = heartMark();
   else if (o.voted && p.voted) l = okMark();
@@ -843,10 +845,10 @@ function confirmN() { if (!canConfirm()) return; socket.emit('nconfirm', { ids: 
 
 /* ----- deaths (công bố + lời trăng trối) ----- */
 function deathCard(d) {
-  const p = P(d.id), t = p.team || 'vil';
+  const p = P(d.id);
   return `<div class="card death"><div class="dav"><div class="ring">${avatar(p)}</div><span class="stamp">BỊ LOẠI</span></div>
   <div class="dn">${esc(p.name)}${isMe(p) ? ' (bạn)' : ''}</div><p class="mut">${CAUSE[d.cause]}</p>
-  <div class="team ${t}">${teamMark(t, 30)} Thuộc ${TEAM[t].n}</div><p class="mut sm">Vai cụ thể được giữ bí mật đến hết ván</p></div>`;
+  <div class="cont ${ST.over ? 'over' : ''}">${ST.over ? ic('trophy') + ' Trò chơi kết thúc' : ic('replay') + ' Trò chơi tiếp tục'}</div><p class="mut sm">Vai và phe của người bị loại được giữ bí mật đến hết ván</p></div>`;
 }
 SCREENS.deaths = {
   full() {

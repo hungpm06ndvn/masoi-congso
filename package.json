@@ -1,6 +1,6 @@
 {
   "name": "masoi-congso",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Ma Sói Công Sở - game Ma sói nhiều người chơi cho giờ nghỉ trưa",
   "main": "server.js",
   "scripts": {

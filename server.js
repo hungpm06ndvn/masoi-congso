@@ -141,7 +141,7 @@ function view(room, me) {
     players: room.players.map(p => {
       const o = { id: p.id, name: p.name, color: p.color, isBot: p.isBot, connected: p.isBot || p.connected, alive: started ? p.alive : true, revealed: !!p.revealed };
       if (started && (ended || p.id === me.id || (me.role === 'wolf' && p.role === 'wolf'))) o.role = p.role;
-      if (p.revealed) o.team = team(p);
+      if (ended) o.team = team(p); // phe chỉ công khai khi hết ván
       if (me.known && p.id in me.known) o.known = me.known[p.id];
       if (loverVis && room.lovers.includes(p.id)) o.lover = true;
       if (kind === 'wolf' && p.role === 'wolf' && p.id !== me.id) o.wsel = p.isBot ? (room.wSuggest != null ? [room.wSuggest] : []) : (p.sel || []);
@@ -157,7 +157,7 @@ function view(room, me) {
   };
   if (kind) v.cand = ncand(room, me, kind);
   if (kind === 'witch') v.witch = { target: room.wTarget, save: room.witch.save, poison: room.witch.poison, chosenSave: !!room.witchSave, chosenPoison: room.witchPoison };
-  if (room.phase === 'deaths') { v.deaths = room.deaths; v.dtitle = room.dtitle; v.dctx = room.dctx; }
+  if (room.phase === 'deaths') { v.deaths = room.deaths.map(d => ({ id: d.id, cause: d.cause })); v.dtitle = room.dtitle; v.dctx = room.dctx; v.over = !!win(room); }
   if (room.phase === 'hunter') { v.hunterId = room.hunterId === me.id ? me.id : -1; if (room.hunterId === me.id) v.cand = alive(room).map(p => p.id); }
   if (room.phase === 'tally') v.tally = room.tally;
   if (ended) {
