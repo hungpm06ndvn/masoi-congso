@@ -366,6 +366,7 @@ body.day .felt{background:radial-gradient(circle at 50% 40%,rgba(255,214,140,.40
 .dn2{position:absolute;right:-6px;top:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:linear-gradient(135deg,#ffd76b,#ff8a5c);color:#2a1300;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid #1a1b45}
 .di.wolf .dn2{background:linear-gradient(135deg,#ff7d9a,#e2364a);color:#fff}
 #ver{position:relative;z-index:1;text-align:center;font-size:11px;letter-spacing:.3px;color:rgba(255,255,255,.32);padding:4px 0 calc(14px + env(safe-area-inset-bottom));pointer-events:none}
+.upd{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:90;padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#ffd76b,#ff8a5c);color:#2a1300;font-weight:800;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 10px 24px -8px rgba(0,0,0,.5);animation:pop .3s}
 </style>
 </head>
 <body class="night">
@@ -1002,7 +1003,19 @@ function profile() {
 }
 
 /* ----- phiên bản ----- */
-fetch('/version.json', { cache: 'no-store' }).then(r => r.json()).then(v => { $('ver').textContent = `Phiên bản ${v.version} · cập nhật ${v.updated}`; }).catch(() => {});
+// Phiên bản đang chạy trên trang này được nhúng sẵn lúc build; máy chủ báo phiên bản của nó khi kết nối.
+const CLIENT_VERSION = '__CLIENT_VERSION__';
+$('ver').textContent = `Phiên bản ${CLIENT_VERSION} · cập nhật __CLIENT_UPDATED__`;
+let UPDATING = false;
+function checkVersion(v) {
+  if (!v || !v.version || v.version === CLIENT_VERSION || UPDATING) return;
+  UPDATING = true;
+  const b = document.createElement('div'); b.className = 'upd'; b.innerHTML = `${ic('replay')} Đã có phiên bản ${v.version} · đang tải lại…`; document.body.appendChild(b);
+  setTimeout(() => { location.reload(); }, 1500);
+}
+socket.on('version', checkVersion);
+setInterval(() => { fetch('/version.json', { cache: 'no-store' }).then(r => r.json()).then(checkVersion).catch(() => {}); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) fetch('/version.json', { cache: 'no-store' }).then(r => r.json()).then(checkVersion).catch(() => {}); });
 
 /* ----- khởi động ----- */
 if (!st.get('msc_room', null)) home(); else view(`<div class="card center" style="margin-top:40vh"><p class="mut">Đang kết nối lại phòng…</p></div>`);

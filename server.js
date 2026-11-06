@@ -12,7 +12,15 @@ const io = new Server(server, { pingInterval: 10000, pingTimeout: 20000 });
 const PORT = process.env.PORT || 3000;
 const TS = Number(process.env.TIME_SCALE || 1); // chỉ dùng khi kiểm thử
 
-app.use(express.static(path.join(__dirname, 'public')));
+const VERSION = (() => { try { return require('./public/version.json'); } catch (e) { return { version: 'dev', updated: '' }; } })();
+const fs = require('fs');
+const INDEX = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8')
+  .replace('__CLIENT_VERSION__', VERSION.version).replace('__CLIENT_UPDATED__', VERSION.updated);
+app.get(['/', '/index.html'], (_req, res) => { res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); res.type('html').send(INDEX); });
+// Không cache trang chính và file phiên bản để người chơi luôn nhận bản mới nhất
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, file) => { if (/\.(html|json)$/.test(file)) res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); }
+}));
 app.get('/health', (_req, res) => res.send('ok'));
 app.get('/qr/:code.svg', async (req, res) => {
   try {
@@ -450,6 +458,7 @@ function genCode() { let c; do { c = String(1000 + Math.floor(Math.random() * 90
 function uniqueName(room, name) { let n = name, i = 2; const has = x => room.players.some(p => p.name.toLowerCase() === x.toLowerCase()); while (has(n)) n = `${name} ${i++}`; return n; }
 
 io.on('connection', socket => {
+  socket.emit('version', VERSION);
   const ctx = () => { const room = rooms.get(socket.data.code); if (!room) return {}; const me = room.players.find(p => p.id === socket.data.pid && !p.isBot); return { room, me }; };
   const on = (ev, fn) => socket.on(ev, (...args) => { try { fn(...args); } catch (e) { console.error('[socket error]', ev, e); } });
   const bind = (room, p, cb) => {
@@ -554,4 +563,4 @@ setInterval(() => {
   for (const [code, room] of rooms) if (!humans(room).some(p => p.connected) && now - room.lastActive > 30 * 60 * 1000) { clearTimers(room); rooms.delete(code); }
 }, 5 * 60 * 1000);
 
-server.listen(PORT, () => console.log(`Ma Sói Công Sở đang chạy tại cổng ${PORT}`));
+server.listen(PORT, () => console.log(`Ma Sói Công Sở v${VERSION.version} đang chạy tại cổng ${PORT}`));
