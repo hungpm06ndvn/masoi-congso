@@ -355,6 +355,16 @@ body.day .felt{background:radial-gradient(circle at 50% 40%,rgba(255,214,140,.40
 .vrow,.lbr,.tle{border-color:var(--gline)}
 .tlg{background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border-color:var(--gline)}
 .pbarw i{background:linear-gradient(90deg,#ffd76b,#ff8a5c)}
+
+.dist .dh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;font-size:15px}
+.dist .dw{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--mut);font-weight:700}
+.dg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.di{text-align:center;font-size:11px;font-weight:700;color:var(--mut)}
+.di .da{position:relative;width:52px;height:52px;margin:0 auto 6px}
+.di .da .art{width:52px;height:52px;border-radius:50%;box-shadow:0 8px 18px -6px rgba(0,0,0,.6)}
+.di.wolf .da .art{box-shadow:0 0 0 2px rgba(255,93,120,.8),0 8px 18px -6px rgba(0,0,0,.6)}
+.dn2{position:absolute;right:-6px;top:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:linear-gradient(135deg,#ffd76b,#ff8a5c);color:#2a1300;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid #1a1b45}
+.di.wolf .dn2{background:linear-gradient(135deg,#ff7d9a,#e2364a);color:#fff}
 </style>
 </head>
 <body class="night">
@@ -711,6 +721,11 @@ function betHTML() {
   const b = ME().bet; return b ? `<p class="mut sm" style="margin:0">Bạn đã cược <b>${TEAM[b].n}</b> thắng · đúng được +40 điểm</p>`
     : `<p class="mut sm" style="margin:0 0 8px">Cược phe thắng chung cuộc (đúng được +40 điểm):</p><div class="chips"><button class="chip" onclick="socket.emit('bet',{team:'wolf'})">${teamMark('wolf', 18)} Phe Sói</button><button class="chip" onclick="socket.emit('bet',{team:'vil'})">${teamMark('vil', 18)} Phe Dân</button></div>`;
 }
+function distHTML() {
+  const d = ST.dist || {}, order = ['wolf', 'seer', 'guard', 'witch', 'hunter', 'cupid', 'vil'], total = Object.values(d).reduce((a, b) => a + b, 0);
+  return `<div class="card dist"><div class="dh"><b>Cơ cấu vai · ${total} người</b><span class="dw">${teamMark('wolf', 18)} ${d.wolf || 0} Sói vs ${teamMark('vil', 18)} ${total - (d.wolf || 0)} Dân</span></div>
+  <div class="dg">${order.filter(k => d[k]).map(k => `<div class="di ${ROLES[k].team}"><div class="da">${art(k)}<span class="dn2">${d[k]}</span></div><small>${ROLES[k].n}</small></div>`).join('')}</div></div>`;
+}
 const ghostCard = () => `<div class="card chat gchat"><div class="hd">${ic('ghost')} Khu khán giả · chỉ người đã bị loại thấy</div><div class="betw" id="betw">${betHTML()}</div>${chatBox('ghost', 'Bình luận cùng những người đã bị loại…')}</div>`;
 
 /* ---------- render dispatcher ---------- */
@@ -739,6 +754,7 @@ SCREENS.lobby = { full() {
   <div class="card center"><img class="qrimg" src="/qr/${ST.code}.svg" alt="Mã QR vào phòng"><p class="mut">Quét mã QR hoặc nhập mã <b style="color:var(--acc)">${ST.code}</b></p>
     <div class="linkrow"><span>${esc(link)}</span><button class="chip" onclick="copyLink('${link}')">${ic('cards')} Sao chép</button></div></div>
   ${table({ n: seats, emptyLabel: 'Bot' }, `<div class="cin"><small>Mã phòng</small><div class="code">${ST.code}</div><small>${hs}/${seats}</small></div>`)}
+  ${distHTML()}
   ${host ? `<div class="card"><label class="lb">Số ghế (thiếu người tự thêm bot)</label><div class="chips">${[6, 7, 8, 9, 10, 11, 12].filter(n => n >= Math.min(12, hs)).map(n => `<button class="chip ${ST.settings.seats == n ? 'on' : ''}" onclick="socket.emit('settings',{seats:${n}})">${n}</button>`).join('')}</div>
     <label class="lb">Nhịp chơi</label><div class="chips"><button class="chip ${ST.settings.speed === 'real' ? 'on' : ''}" onclick="socket.emit('settings',{speed:'real'})">${ic('clock')} Chuẩn (~10 phút)</button><button class="chip ${ST.settings.speed === 'demo' ? 'on' : ''}" onclick="socket.emit('settings',{speed:'demo'})">${ic('bolt')} Nhanh</button></div></div>
     <button class="btn" onclick="socket.emit('start')">${ic('cards', 18)} Chia vai & bắt đầu${bots ? ` (thêm ${bots} bot)` : ''}</button>`
@@ -757,7 +773,7 @@ SCREENS.reveal = {
     <div><h2 class="ttl">Vai bí mật của bạn</h2><p class="mut">Che màn hình, giữ thẻ để xem. Thả tay ra, thẻ tự úp lại.</p></div>
     <div class="rc" id="rc" oncontextmenu="return false"><div class="back"><div class="bm"></div><div class="bt">MA SÓI CÔNG SỞ</div><div class="bs">Giữ để lật thẻ</div></div>
       <div class="front" style="--rc:${r.c}"><div class="emb">${art(me.role)}</div><div class="rn">${r.n}</div><div class="rt ${r.team}">${TEAM[r.team].n}</div><p>${r.d}</p>${mates ? `<p class="mate">Đồng bọn: <b>${esc(mates)}</b></p>` : ''}</div></div>
-    <div id="act"></div>`);
+    ${distHTML()}<div id="act"></div>`);
     const rc = $('rc');
     rc.addEventListener('pointerdown', e => { e.preventDefault(); rc.classList.add('open'); vib(20); });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => rc.addEventListener(t, () => rc.classList.remove('open')));
@@ -788,7 +804,8 @@ function witchPanel() {
 function loveNote() { const ls = ST.players.filter(p => p.lover); return ls.length === 2 ? `<div class="res love" style="display:flex;align-items:center;justify-content:center;gap:10px">${heartMark(28)} ${esc(ls[0].name)} & ${esc(ls[1].name)} đã thành một cặp</div>` : ''; }
 SCREENS.night = {
   full() {
-    setMode('night'); const me = ME(), k = me.kind, [t, h] = NK[k] || ['', ''];
+    setMode('night'); const me = ME(), k = me.kind; let [t, h] = NK[k] || ['', ''];
+    if (k === 'cover' && me.role === 'witch') h = 'Bước này chỉ để che vai. Ngay sau đây bạn sẽ được xem ai bị Sói tấn công và dùng bình cứu hoặc bình độc.';
     view(`${hdr('moon', 'Đêm ' + ST.round)}<div><h2 class="ttl">${t}</h2><p class="mut">${h}</p></div><div id="tw"></div><div id="note"></div>
     ${k === 'wolf' ? `<div class="card chat wchat"><div class="hd">${teamMark('wolf', 18)} Kênh bí mật của Sói</div>${chatBox('wolf', 'Nhắn cho đồng bọn…')}</div>` : ''}
     ${k === 'ghost' ? ghostCard() : ''}<div id="act"></div>`);

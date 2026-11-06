@@ -128,7 +128,7 @@ function view(room, me) {
   const kind = nkind(room, me);
   const v = {
     now: Date.now(), code: room.code, phase: room.phase, round: room.round, gameNo: room.gameNo, endsAt: room.endsAt, total: room.total,
-    hostId: room.hostId, settings: room.settings,
+    hostId: room.hostId, settings: room.settings, dist: distOf(started ? room.players.length : Math.max(room.settings.seats, humans(room).length)),
     me: { id: me.id, name: me.name, role: started ? me.role : null, alive: me.alive, kind, done: !!me.done, pick: me.pick || [], note: me.note || '', bet: me.bet || null, readyVote: !!me.readyVote, vote: me.vote ?? null, vdone: !!me.vdone, ready: !!me.ready },
     players: room.players.map(p => {
       const o = { id: p.id, name: p.name, color: p.color, isBot: p.isBot, connected: p.isBot || p.connected, alive: started ? p.alive : true, revealed: !!p.revealed };
@@ -161,6 +161,7 @@ function view(room, me) {
   }
   return v;
 }
+function distOf(n) { const c = {}; (DIST[Math.max(6, Math.min(12, n))] || []).forEach(r => { c[r] = (c[r] || 0) + 1; }); return c; }
 function push(room) {
   room.lastActive = Date.now();
   for (const p of room.players) if (!p.isBot && p.sid) io.to(p.sid).emit('state', view(room, p));
@@ -262,7 +263,8 @@ function endNight(room) {
     if (room.witch.save && Math.random() < (room.wTarget === wi.id ? 0.9 : 0.5)) { room.witchSave = true; room.witch.save = false; }
     if (room.witch.poison && room.round >= 2 && Math.random() < 0.35) { const t = topSus(room, alive(room).filter(p => p.id !== wi.id && p.id !== room.wTarget)); if (t) { room.witchPoison = t.id; room.witch.poison = false; } }
   }
-  if (room.hasWitch) phase(room, 'witch', wi && !wi.isBot ? 20 : 8, () => resolveNight(room));
+  room.players.forEach(p => { p.done = false; if (p.role === 'witch') { p.pick = []; p.sel = []; } });
+  if (room.hasWitch) phase(room, 'witch', wi && !wi.isBot ? 25 : 8, () => resolveNight(room));
   else resolveNight(room);
 }
 function resolveNight(room) {
