@@ -289,6 +289,72 @@ body.day .dots{background:#fff}
 .qrimg{width:150px;height:150px;display:block;margin:0 auto 10px;border-radius:14px;background:#fff;padding:6px}
 .linkrow{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:10px;font-size:12px;color:var(--mut);flex-wrap:wrap}
 .linkrow span{word-break:break-all}
+
+/* ===== v5 · làm mới giao diện ===== */
+:root{--tx:#f3f4ff;--mut:#a9afd9;--acc:#ffc94d;--acc2:#ff8a5c;--vio:#8b5cf6;--red:#ff5d78;--grn:#34d399;--glass:rgba(255,255,255,.055);--gline:rgba(255,255,255,.10)}
+body.day{--tx:#f7f7ff;--mut:#dcdcf5;--glass:rgba(255,255,255,.11);--gline:rgba(255,255,255,.20)}
+html,html:has(body.day){background:#070a1c}
+body,body.day{background:#070a1c;letter-spacing:-.1px}
+#sky{background:radial-gradient(120% 60% at 50% -10%,#3b2f8f 0%,#191b4d 45%,#070a1c 100%)}
+#dayb{background:linear-gradient(180deg,#2c3a92 0%,#5a4cb4 34%,#c0699c 70%,#ff9f6b 100%)}
+#dayb:after{content:"";position:absolute;left:50%;top:-140px;width:460px;height:460px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,214,140,.55),rgba(255,214,140,0) 65%)}
+#dayb .b1{background:#ffd36e;opacity:.35}#dayb .b2{background:#ff6fae;opacity:.25}
+#app{gap:16px;padding:16px 16px 24px}
+h1{font-size:36px;letter-spacing:-1px;background:linear-gradient(120deg,#fff6d6 0%,#ffc94d 45%,#ff8a5c 100%);-webkit-background-clip:text;background-clip:text}
+.ttl{font-size:24px;letter-spacing:-.6px;line-height:1.2}
+.mut{line-height:1.5}
+/* thẻ kính viền gradient */
+.card,body.day .card{background:linear-gradient(160deg,rgba(255,255,255,.085),rgba(255,255,255,.03)) padding-box,linear-gradient(150deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 45%,rgba(139,92,246,.35)) border-box;border:1px solid transparent;border-radius:24px;box-shadow:0 20px 40px -20px rgba(0,0,0,.5);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%)}
+/* nút */
+.btn{min-height:54px;border-radius:18px;font-size:16px;background:linear-gradient(135deg,#ffd76b 0%,#ffb340 50%,#ff8a5c 100%);color:#2a1300;box-shadow:0 12px 28px -8px rgba(255,150,70,.6),inset 0 1px 0 rgba(255,255,255,.55)}
+.btn.red{background:linear-gradient(135deg,#ff7d9a 0%,#ff4d6d 55%,#d9265b 100%);color:#fff;box-shadow:0 12px 28px -8px rgba(255,77,109,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.sec{background:rgba(255,255,255,.07);border:1px solid var(--gline);color:var(--tx);backdrop-filter:blur(12px)}
+.btn:disabled{opacity:.4;filter:saturate(.6)}
+/* thanh hành động dính đáy màn hình */
+#act.dock{position:sticky;bottom:0;z-index:20;}
+#act{padding:10px 0 calc(10px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+#act:empty{display:none}
+#act .btn{box-shadow:0 16px 36px -10px rgba(0,0,0,.6),0 12px 28px -8px rgba(255,150,70,.45)}
+/* pill & chip */
+.pill{padding:8px 13px;background:rgba(255,255,255,.08);border:1px solid var(--gline);backdrop-filter:blur(14px);font-size:13px}
+.chip{background:rgba(255,255,255,.07);border:1px solid var(--gline);padding:9px 14px;backdrop-filter:blur(10px)}
+.chip.on{background:linear-gradient(135deg,#ffd76b,#ff9a4d);color:#2a1300;border-color:transparent;box-shadow:0 6px 16px -6px rgba(255,150,70,.7)}
+.in{background:rgba(255,255,255,.06);border-color:var(--gline);border-radius:16px}
+/* bàn chơi: đấu trường phát sáng */
+.felt,body.day .felt{inset:16%;background:radial-gradient(circle at 50% 45%,rgba(139,92,246,.30),rgba(30,26,80,.55) 55%,rgba(10,12,35,.75) 100%);border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 10px rgba(255,255,255,.035),0 0 0 22px rgba(255,255,255,.02),0 0 80px rgba(139,92,246,.35),inset 0 0 50px rgba(139,92,246,.35)}
+body.day .felt{background:radial-gradient(circle at 50% 40%,rgba(255,214,140,.40),rgba(120,70,160,.45) 60%,rgba(40,30,90,.65) 100%);box-shadow:0 0 0 10px rgba(255,255,255,.06),0 0 0 22px rgba(255,255,255,.035),0 0 80px rgba(255,190,120,.35),inset 0 0 50px rgba(255,190,120,.3)}
+.felt:before{content:"";position:absolute;inset:-12%;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 70%,rgba(255,201,77,.55) 85%,transparent 100%);-webkit-mask:radial-gradient(circle,transparent 66%,#000 67%,#000 69%,transparent 70%);mask:radial-gradient(circle,transparent 66%,#000 67%,#000 69%,transparent 70%);animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.trk,body.day .trk{stroke:rgba(255,255,255,.12)}
+.prog{stroke:url(#none);stroke:var(--acc)}
+.cin b{font-size:40px;letter-spacing:-1px}
+/* ghế */
+.sav .ring{border:2.5px solid rgba(255,255,255,.75);box-shadow:0 10px 22px -6px rgba(0,0,0,.55)}
+.seat.can .ring{border-color:#fff}
+.seat.sel .ring{border-color:#ffc94d;box-shadow:0 0 0 4px rgba(255,201,77,.35),0 0 26px rgba(255,201,77,.85)}
+.seat.sel{transform:translate(-50%,-50%) scale(1.08)}
+.seat.me .ring{border-color:#a5b4ff;box-shadow:0 0 0 3px rgba(165,180,255,.3),0 10px 22px -6px rgba(0,0,0,.55)}
+.snm,body.day .snm{text-shadow:0 1px 6px rgba(0,0,0,.6)}
+/* chat */
+.bub,body.day .bub{background:rgba(255,255,255,.10);border:1px solid var(--gline);color:var(--tx);backdrop-filter:blur(10px)}
+.msg.me .bub{background:linear-gradient(135deg,#ffd76b,#ff9a4d);color:#2a1300}
+.dots,body.day .dots{background:rgba(255,255,255,.10)}
+.chatin{background:rgba(0,0,0,.12)}
+.chatin input,body.day .chatin input{background:rgba(255,255,255,.08);color:var(--tx);border-color:var(--gline)}
+.chatin button{background:linear-gradient(135deg,#ffd76b,#ff9a4d)}
+.stk button{background:rgba(255,255,255,.08);border-color:var(--gline);border-radius:16px}
+/* thẻ bị loại */
+.death{padding:28px 18px}
+.dav .ring{border-color:rgba(255,255,255,.85)}
+.stamp{background:rgba(255,255,255,.92)}
+/* intro ban ngày */
+.intro.day{background:linear-gradient(180deg,#2c3a92 0%,#7a55b8 45%,#ff9f6b 100%);color:#fff}
+.intro.night{background:radial-gradient(circle at 50% 40%,#3b2f8f,#070a1c 70%)}
+/* hồ sơ, bảng */
+.bd{background:rgba(255,255,255,.06)}
+.vrow,.lbr,.tle{border-color:var(--gline)}
+.tlg{background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border-color:var(--gline)}
+.pbarw i{background:linear-gradient(90deg,#ffd76b,#ff8a5c)}
 </style>
 </head>
 <body class="night">
@@ -645,7 +711,7 @@ function betHTML() {
   const b = ME().bet; return b ? `<p class="mut sm" style="margin:0">Bạn đã cược <b>${TEAM[b].n}</b> thắng · đúng được +40 điểm</p>`
     : `<p class="mut sm" style="margin:0 0 8px">Cược phe thắng chung cuộc (đúng được +40 điểm):</p><div class="chips"><button class="chip" onclick="socket.emit('bet',{team:'wolf'})">${teamMark('wolf', 18)} Phe Sói</button><button class="chip" onclick="socket.emit('bet',{team:'vil'})">${teamMark('vil', 18)} Phe Dân</button></div>`;
 }
-const ghostCard = () => `<div class="card chat gchat"><div class="hd">${ic('ghost')} Khu khán giả · bạn thấy được vai của mọi người</div><div class="betw" id="betw">${betHTML()}</div>${chatBox('ghost', 'Bình luận cùng những người đã bị loại…')}</div>`;
+const ghostCard = () => `<div class="card chat gchat"><div class="hd">${ic('ghost')} Khu khán giả · chỉ người đã bị loại thấy</div><div class="betw" id="betw">${betHTML()}</div>${chatBox('ghost', 'Bình luận cùng những người đã bị loại…')}</div>`;
 
 /* ---------- render dispatcher ---------- */
 function render(prev) {
@@ -659,6 +725,7 @@ function render(prev) {
   if (fresh) { KEY = key; SEL = []; SAVE = false; Object.keys(FEEDSIG).forEach(k => delete FEEDSIG[k]); }
   const R = SCREENS[ST.phase]; if (!R) return;
   if (fresh || !R.part) R.full(); else R.part();
+  const A = $('act'); if (A) A.classList.toggle('dock', !document.querySelector('.chatin'));
   if (ST.phase === 'end') saveProfile();
 }
 const SCREENS = {};
@@ -708,7 +775,7 @@ const NK = {
   cover: ['Bạn nghi ai nhất?', 'Vai nào cũng phải bấm ban đêm, để không ai đoán được vai qua việc ai đang dùng máy.'],
   witch: ['Phù thủy ra tay', 'Cứu người bị Sói tấn công, hoặc đầu độc một người. Không bắt buộc.'],
   wait: ['Phù thủy đang hành động…', 'Hãy tiếp tục cúi xuống điện thoại, đừng để lộ gì.'],
-  ghost: ['Bạn đang ở khu khán giả', 'Bạn thấy được vai của mọi người. Đừng tiết lộ gì ra bàn nhé.']
+  ghost: ['Bạn đã bị loại', 'Hãy theo dõi trong im lặng. Bạn vẫn có thể cược phe thắng và trò chuyện ở khu khán giả.']
 };
 function canConfirm() { const k = ME().kind; return k === 'cupid' ? SEL.length === 2 : k === 'witch' ? true : ['wolf', 'seer', 'guard', 'cover'].includes(k) && SEL.length === 1; }
 function witchPanel() {
@@ -722,9 +789,9 @@ function loveNote() { const ls = ST.players.filter(p => p.lover); return ls.leng
 SCREENS.night = {
   full() {
     setMode('night'); const me = ME(), k = me.kind, [t, h] = NK[k] || ['', ''];
-    view(`${hdr('moon', 'Đêm ' + ST.round)}<div><h2 class="ttl">${t}</h2><p class="mut">${h}</p></div><div id="tw"></div><div id="note"></div><div id="act"></div>
+    view(`${hdr('moon', 'Đêm ' + ST.round)}<div><h2 class="ttl">${t}</h2><p class="mut">${h}</p></div><div id="tw"></div><div id="note"></div>
     ${k === 'wolf' ? `<div class="card chat wchat"><div class="hd">${teamMark('wolf', 18)} Kênh bí mật của Sói</div>${chatBox('wolf', 'Nhắn cho đồng bọn…')}</div>` : ''}
-    ${k === 'ghost' ? ghostCard() : ''}`);
+    ${k === 'ghost' ? ghostCard() : ''}<div id="act"></div>`);
     this.part();
   },
   part() {
@@ -755,20 +822,12 @@ function pickN(id) {
 function confirmN() { if (!canConfirm()) return; socket.emit('nconfirm', { ids: SEL, save: SAVE }); }
 
 /* ----- deaths (công bố + lời trăng trối) ----- */
-function lwHTML(d) {
-  const p = P(d.id);
-  if (d.lwDone) return `<div class="lwh">${ic('chat')} Lời trăng trối</div>${d.lw ? `<div class="msg ${isMe(p) ? 'me' : ''}">${mini(p)}<div class="bub">${d.lw}</div></div>` : '<p class="mut sm">Ra đi trong im lặng…</p>'}`;
-  if (isMe(p)) return `<div class="lwh">${ic('chat')} Lời trăng trối của bạn</div><form class="chatin lwf" onsubmit="sendLW(event)"><input id="lwi" maxlength="160" autocomplete="off" placeholder="Nói câu cuối với cả bàn…"><button type="submit">${ic('send')}</button></form>`;
-  return `<div class="lwh">${ic('chat')} Lời trăng trối</div><div class="typing">${mini(p)}<span class="dots"><i></i><i></i><i></i></span></div>`;
-}
 function deathCard(d) {
   const p = P(d.id), t = p.team || 'vil';
   return `<div class="card death"><div class="dav"><div class="ring">${avatar(p)}</div><span class="stamp">BỊ LOẠI</span></div>
   <div class="dn">${esc(p.name)}${isMe(p) ? ' (bạn)' : ''}</div><p class="mut">${CAUSE[d.cause]}</p>
-  <div class="team ${t}">${teamMark(t, 30)} Thuộc ${TEAM[t].n}</div><p class="mut sm">Vai cụ thể được giữ bí mật đến hết ván</p>
-  <div class="lw" id="lw_${p.id}">${lwHTML(d)}</div></div>`;
+  <div class="team ${t}">${teamMark(t, 30)} Thuộc ${TEAM[t].n}</div><p class="mut sm">Vai cụ thể được giữ bí mật đến hết ván</p></div>`;
 }
-function sendLW(e) { e.preventDefault(); socket.emit('lw', { text: ($('lwi').value || '').trim() }); }
 SCREENS.deaths = {
   full() {
     setMode('day'); const D = ST.deaths || [], me = ME();
@@ -782,7 +841,6 @@ SCREENS.deaths = {
     this.part();
   },
   part() {
-    (ST.deaths || []).forEach(d => { const el = $('lw_' + d.id); if (!el) return; if (isMe(P(d.id)) && !d.lwDone && $('lwi')) return; const h = lwHTML(d); if (el.dataset.h !== h) { el.innerHTML = h; el.dataset.h = h; } });
     set('act', isHost() ? `<button class="btn" onclick="socket.emit('skip')">Tiếp tục</button>` : `<p class="mut center sm">Tự động chuyển tiếp khi hết giờ…</p>`);
   }
 };
@@ -790,12 +848,12 @@ SCREENS.deaths = {
 /* ----- hunter ----- */
 SCREENS.hunter = {
   full() {
-    setMode('day'); const h = P(ST.hunterId), mine = h && isMe(h);
-    view(`${hdr('cross', 'Thợ săn')}<div class="card lovec"><div style="width:54px;flex:none">${art('hunter')}</div><div>${mine ? '<b>Bạn là Thợ săn!</b> Chọn một người để bắn trước khi gục ngã. Hết giờ mà chưa chọn thì bỏ lượt.' : `<b>${esc(h ? h.name : '')}</b> là Thợ săn và đang ngắm bắn…`}</div></div><div id="tw"></div><div id="act"></div>`);
+    setMode('day'); const mine = ST.hunterId === ME().id;
+    view(`${hdr('cross', mine ? 'Thợ săn' : 'Chờ một chút')}<div class="card lovec"><div style="width:54px;flex:none">${art(mine ? 'hunter' : 'moon')}</div><div>${mine ? '<b>Bạn là Thợ săn!</b> Chọn một người để bắn trước khi gục ngã. Hết giờ mà chưa chọn thì bỏ lượt.' : 'Có người vẫn còn một hành động cuối cùng… Hãy chờ trong giây lát.'}</div></div><div id="tw"></div><div id="act"></div>`);
     this.part();
   },
   part() {
-    const mine = isMe(P(ST.hunterId)), cand = ST.cand || [];
+    const mine = ST.hunterId === ME().id, cand = ST.cand || [];
     set('tw', table({ sel: SEL, can: p => mine && cand.includes(p.id), on: 'pickH' }, timerMid('Ngắm bắn')));
     set('act', mine ? `<button class="btn red" ${!SEL.length ? 'disabled' : ''} onclick="socket.emit('shoot',{id:SEL[0]})">${!SEL.length ? 'Chạm vào người bạn muốn bắn' : ic('cross', 18) + ' Bắn ' + esc(P(SEL[0]).name)}</button>` : '');
   }
@@ -839,7 +897,7 @@ function react(k) { socket.emit('react', { to: SEL.length ? SEL[0] : null, k });
 SCREENS.vote = {
   full() {
     setMode('day'); const me = ME(); if (me.vote != null) SEL = [me.vote];
-    view(`${hdr('vote', 'Biểu quyết · Ngày ' + ST.round)}<div><h2 class="ttl">Bỏ phiếu kín</h2><p class="mut">Phiếu của mọi người được lật cùng lúc khi hết giờ. Dấu tích xanh: người đã bỏ phiếu.</p></div><div id="tw"></div><div id="act"></div>${!me.alive ? ghostCard() : ''}`);
+    view(`${hdr('vote', 'Biểu quyết · Ngày ' + ST.round)}<div><h2 class="ttl">Bỏ phiếu kín</h2><p class="mut">Phiếu của mọi người được lật cùng lúc khi hết giờ. Dấu tích xanh: người đã bỏ phiếu.</p></div><div id="tw"></div>${!me.alive ? ghostCard() : ''}<div id="act"></div>`);
     this.part();
   },
   part() {

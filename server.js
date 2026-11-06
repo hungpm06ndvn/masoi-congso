@@ -41,7 +41,7 @@ const DIST = {
 };
 const BOT_NAMES = ['Lan', 'Minh', 'Hùng', 'Trang', 'Tuấn', 'Hà', 'Phong', 'Ngọc', 'Khoa', 'Linh', 'Quân', 'Mai'];
 const COLORS = ['#7aa7ff', '#ff9db5', '#ffc46b', '#7fe0b8', '#c3a4ff', '#ff9a8a', '#79d6e6', '#e9c27d', '#a8b3ff', '#ffb0d9', '#9be38f', '#f7a26b'];
-const CAUSE = { wolf: 'đã bị Sói tấn công đêm qua', poison: 'đã trúng bình độc của Phù thủy', love: 'chết theo người yêu vì quá đau lòng', vote: 'bị cả bàn biểu quyết loại', shot: 'trúng phát súng của Thợ săn' };
+const CAUSE = { wolf: 'đã bị Sói tấn công đêm qua', poison: 'đã trúng bình độc của Phù thủy', love: 'chết theo người yêu vì quá đau lòng', vote: 'bị cả bàn biểu quyết loại', shot: 'trúng một phát súng bất ngờ' };
 const STICKERS = ['nghi', 'oan', 'haha', 'soc', 'gian', 'tim'];
 
 const rnd = a => a[Math.floor(Math.random() * a.length)];
@@ -124,7 +124,7 @@ function view(room, me) {
   const started = room.phase !== 'lobby';
   const ended = room.phase === 'end';
   const spect = started && !me.alive;
-  const loverVis = room.lovers && (ended || spect || me.role === 'cupid' || room.lovers.includes(me.id));
+  const loverVis = room.lovers && (ended || me.role === 'cupid' || room.lovers.includes(me.id));
   const kind = nkind(room, me);
   const v = {
     now: Date.now(), code: room.code, phase: room.phase, round: room.round, gameNo: room.gameNo, endsAt: room.endsAt, total: room.total,
@@ -132,7 +132,7 @@ function view(room, me) {
     me: { id: me.id, name: me.name, role: started ? me.role : null, alive: me.alive, kind, done: !!me.done, pick: me.pick || [], note: me.note || '', bet: me.bet || null, readyVote: !!me.readyVote, vote: me.vote ?? null, vdone: !!me.vdone, ready: !!me.ready },
     players: room.players.map(p => {
       const o = { id: p.id, name: p.name, color: p.color, isBot: p.isBot, connected: p.isBot || p.connected, alive: started ? p.alive : true, revealed: !!p.revealed };
-      if (started && (ended || spect || p.id === me.id || (me.role === 'wolf' && p.role === 'wolf'))) o.role = p.role;
+      if (started && (ended || p.id === me.id || (me.role === 'wolf' && p.role === 'wolf'))) o.role = p.role;
       if (p.revealed) o.team = team(p);
       if (me.known && p.id in me.known) o.known = me.known[p.id];
       if (loverVis && room.lovers.includes(p.id)) o.lover = true;
@@ -150,7 +150,7 @@ function view(room, me) {
   if (kind) v.cand = ncand(room, me, kind);
   if (kind === 'witch') v.witch = { target: room.wTarget, save: room.witch.save, poison: room.witch.poison, chosenSave: !!room.witchSave, chosenPoison: room.witchPoison };
   if (room.phase === 'deaths') { v.deaths = room.deaths; v.dtitle = room.dtitle; v.dctx = room.dctx; }
-  if (room.phase === 'hunter') { v.hunterId = room.hunterId; if (room.hunterId === me.id) v.cand = alive(room).map(p => p.id); }
+  if (room.phase === 'hunter') { v.hunterId = room.hunterId === me.id ? me.id : -1; if (room.hunterId === me.id) v.cand = alive(room).map(p => p.id); }
   if (room.phase === 'tally') v.tally = room.tally;
   if (ended) {
     const w = room.result.w, won = team(me) === w, st = me.stats || {};
@@ -292,7 +292,7 @@ function resolveNight(room) {
 }
 function kill(room, id, cause, L) {
   const p = P(room, id); if (!p || !p.alive) return;
-  p.alive = false; p.revealed = true; L.push({ id, cause, lw: null, lwDone: false });
+  p.alive = false; p.revealed = true; L.push({ id, cause });
   log(room, { t: 'team', k: team(p) }, `${B(p)} ${CAUSE[cause]} · thuộc ${TEAMN[team(p)]}`);
   if (room.lovers && room.lovers.includes(id)) { const o = room.lovers.find(x => x !== id); if (o != null && P(room, o)?.alive) kill(room, o, 'love', L); }
 }
@@ -300,27 +300,10 @@ function kill(room, id, cause, L) {
 /* ------------------------------------------------------------------ */
 /* Công bố người bị loại, lời trăng trối, Thợ săn                       */
 /* ------------------------------------------------------------------ */
-function botLW(room, p) {
-  const others = alive(room).filter(x => x.id !== p.id); if (!others.length) return 'Tạm biệt mọi người!';
-  if (p.role === 'wolf') { const pool = others.filter(x => x.role !== 'wolf'); const x = rnd(pool.length ? pool : others); room.sus[x.id] += 1.5; return `Tôi là dân oan! Sói chắc chắn là ${B(x)}, nhớ lời tôi.`; }
-  if (p.role === 'seer') { const kw = Object.keys(room.botKnown).map(Number).find(id => room.botKnown[id] && P(room, id)?.alive); if (kw !== undefined) { room.sus[kw] += 6; return `Tôi là Tiên tri! ${B(P(room, kw))} là SÓI, vote ngay!`; } return 'Tôi là Tiên tri, tiếc là chưa soi ra Sói. Cẩn thận nhé!'; }
-  if (p.role === 'hunter') return 'Thợ săn đây. Sói ơi, đỡ phát súng này!';
-  if (p.role === 'witch') return `Tôi là Phù thủy. ${room.witch.poison ? 'Bình độc còn nguyên, tiếc thật.' : 'Mong là bình độc của tôi đã trúng Sói.'}`;
-  if (p.role === 'guard') return 'Tôi là Bảo vệ. Từ giờ mọi người tự lo thân nhé!';
-  if (p.role === 'cupid') return 'Tôi là Cupid. Cặp đôi của tôi ơi, sống tốt nhé!';
-  const x = topSus(room, others); if (x) { room.sus[x.id] += 1.5; return `Tôi là dân thường. Tôi nghi ${B(x)} nhất.`; } return 'Tạm biệt mọi người.';
-}
 function deathsPhase(room, L, ctx, title) {
   room.deaths = L; room.dctx = ctx; room.dtitle = title;
-  if (!L.length) { phase(room, 'deaths', 7, () => after(room, ctx)); return; }
-  phase(room, 'deaths', 18, () => hunterStep(room, L, ctx));
-  L.forEach((d, i) => {
-    const p = P(room, d.id);
-    if (p.isBot) later(room, () => { d.lw = botLW(room, p); d.lwDone = true; log(room, { t: 'av', id: p.id }, `Lời trăng trối của ${B(p)}: “${d.lw}”`); push(room); checkLW(room); }, 2000 + i * 1500);
-    else if (!p.connected) d.lwDone = true;
-  });
+  phase(room, 'deaths', L.length ? 9 : 7, () => (L.length ? hunterStep(room, L, ctx) : after(room, ctx)));
 }
-function checkLW(room) { if (room.phase === 'deaths' && room.deaths.every(d => d.lwDone)) shorten(room, 5); }
 function hunterStep(room, L, ctx) {
   const hd = L.find(d => P(room, d.id).role === 'hunter' && d.cause !== 'poison');
   if (!hd || room.hunterDone) return after(room, ctx);
@@ -330,7 +313,7 @@ function hunterStep(room, L, ctx) {
     const tg = topSus(room, pool.length ? pool : alive(room));
     if (!tg) return after(room, ctx);
     const L2 = []; kill(room, tg.id, 'shot', L2); log(room, { t: 'art', k: 'hunter' }, `Thợ săn ${B(h)} bắn ${B(tg)}`);
-    return deathsPhase(room, L2, ctx, `Thợ săn ${esc(h.name)} nổ súng`);
+    return deathsPhase(room, L2, ctx, 'Một phát súng vang lên');
   }
   room.hunterId = h.id; room.hctx = ctx;
   phase(room, 'hunter', 15, () => fire(room, null));
@@ -342,7 +325,7 @@ function fire(room, id) {
   if (!t || !t.alive) { log(room, { t: 'art', k: 'hunter' }, `Thợ săn ${B(h)} không bắn ai`); return after(room, ctx); }
   if (t.role === 'wolf') h.stats.shotWolf = true;
   const L2 = []; kill(room, t.id, 'shot', L2); log(room, { t: 'art', k: 'hunter' }, `Thợ săn ${B(h)} bắn ${B(t)}`);
-  deathsPhase(room, L2, ctx, `Thợ săn ${esc(h.name)} nổ súng`);
+  deathsPhase(room, L2, ctx, 'Một phát súng vang lên');
 }
 function win(room) { const a = alive(room), w = a.filter(p => p.role === 'wolf').length; if (w === 0) return 'vil'; if (w >= a.length - w) return 'wolf'; return null; }
 function after(room, ctx) { const w = win(room); if (w) return end(room, w); if (ctx === 'night') day(room); else night(room); }
@@ -392,8 +375,8 @@ function analyze(room, p, text) {
 function ghostComment(room) {
   if (!room.players.some(p => !p.isBot && !p.alive)) return;
   const g = room.players.filter(p => !p.alive && p.isBot); if (!g.length) return;
-  const x = rnd(g), w = rnd(alive(room).filter(p => p.role === 'wolf'));
-  later(room, () => { room.gfeed.push({ id: x.id, msg: w ? rnd([`Nhìn từ đây mới thấy ${B(w)} là Sói mà diễn đạt ghê.`, `Cả bàn đang nghi nhầm rồi, Sói là ${B(w)} kìa!`, `${B(w)} mà sống sót được thì phe Dân toang.`]) : 'Hồi hộp thật!' }); push(room); }, 4000);
+  const x = rnd(g);
+  later(room, () => { room.gfeed.push({ id: x.id, msg: rnd(['Hồi hộp thật, không biết ai là Sói nữa.', 'Bị loại sớm tiếc ghê!', 'Mình cược phe Dân, còn bạn?', 'Cả bàn đang tranh cãi căng quá.']) }); push(room); }, 4000);
 }
 function day(room) {
   room.feed = []; room.typing = null;
@@ -545,12 +528,6 @@ io.on('connection', socket => {
     const t = P(room, Number(id)); if (!t || !t.alive || t.id === me.id) return; me.vote = t.id; me.vdone = true;
     if (alive(room).filter(p => !p.isBot && p.connected).every(p => p.vdone)) shorten(room, 2); push(room);
   });
-  on('lw', ({ text } = {}) => {
-    const { room, me } = ctx(); if (!room || !me || room.phase !== 'deaths') return; const d = room.deaths.find(x => x.id === me.id); if (!d || d.lwDone) return;
-    text = clean(text, 160); d.lw = text ? esc(text) : ''; d.lwDone = true;
-    if (text) { log(room, { t: 'av', id: me.id }, `Lời trăng trối của ${B(me)}: “${d.lw}”`); analyze(room, me, text); }
-    push(room); checkLW(room);
-  });
   on('shoot', ({ id } = {}) => { const { room, me } = ctx(); if (room && me && room.phase === 'hunter' && room.hunterId === me.id) fire(room, id); });
   on('bet', ({ team: t } = {}) => { const { room, me } = ctx(); if (!room || !me || me.alive || me.bet || !['wolf', 'vil'].includes(t) || room.phase === 'end') return; me.bet = t; log(room, { t: 'ic', k: 'star' }, `${B(me)} cược ${TEAMN[t]} thắng`); push(room); });
   on('skip', () => {
@@ -563,7 +540,7 @@ io.on('connection', socket => {
     me.connected = false; me.sid = null;
     if (room.phase === 'lobby') {
       setTimeout(() => { if (!me.connected && room.phase === 'lobby' && room.players.includes(me)) { room.players = room.players.filter(p => p !== me); if (room.hostId === me.id && room.players[0]) room.hostId = room.players[0].id; push(room); } }, 30000);
-    } else if (room.phase === 'deaths') { const d = room.deaths.find(x => x.id === me.id); if (d && !d.lwDone) { d.lwDone = true; checkLW(room); } }
+    }
     if (room.hostId === me.id) { const h = humans(room).find(p => p.connected); if (h) room.hostId = h.id; }
     push(room);
   });
