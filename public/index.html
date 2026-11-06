@@ -365,11 +365,13 @@ body.day .felt{background:radial-gradient(circle at 50% 40%,rgba(255,214,140,.40
 .di.wolf .da .art{box-shadow:0 0 0 2px rgba(255,93,120,.8),0 8px 18px -6px rgba(0,0,0,.6)}
 .dn2{position:absolute;right:-6px;top:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:linear-gradient(135deg,#ffd76b,#ff8a5c);color:#2a1300;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid #1a1b45}
 .di.wolf .dn2{background:linear-gradient(135deg,#ff7d9a,#e2364a);color:#fff}
+#ver{position:relative;z-index:1;text-align:center;font-size:11px;letter-spacing:.3px;color:rgba(255,255,255,.32);padding:4px 0 calc(14px + env(safe-area-inset-bottom));pointer-events:none}
 </style>
 </head>
 <body class="night">
 <div id="dayb"><div class="blob b1"></div><div class="blob b2"></div></div><div id="sky"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div id="stars"></div></div>
 <div id="app"></div>
+<div id="ver"></div>
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
@@ -998,6 +1000,9 @@ function profile() {
   <p class="note">Hồ sơ được lưu trên chính điện thoại này.</p>
   <button class="btn" onclick="${ST ? "VIEW='game';KEY='';render()" : 'home()'}">${ST ? 'Quay lại phòng' : 'Về trang chủ'}</button>`);
 }
+
+/* ----- phiên bản ----- */
+fetch('/version.json', { cache: 'no-store' }).then(r => r.json()).then(v => { $('ver').textContent = `Phiên bản ${v.version} · cập nhật ${v.updated}`; }).catch(() => {});
 
 /* ----- khởi động ----- */
 if (!st.get('msc_room', null)) home(); else view(`<div class="card center" style="margin-top:40vh"><p class="mut">Đang kết nối lại phòng…</p></div>`);

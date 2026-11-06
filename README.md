@@ -35,3 +35,4 @@ npm start
 
 - `server.js` — máy chủ Express + Socket.IO, toàn bộ luật chơi, bot và bộ đếm giờ.
 - `public/index.html` — giao diện điện thoại (một file duy nhất).
+- `public/version.json` — số phiên bản và thời gian cập nhật, hiển thị mờ ở cuối màn hình. Cập nhật file này mỗi lần phát hành.
